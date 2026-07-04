@@ -42,4 +42,28 @@ const styles = StyleSheet.create({
   },
 });
 
+import { resolveStop } from './src/api/stops';
+import { fetchJourneys, evaluateJourney } from './src/api/journeys';
+
+async function testBVGApi() {
+  console.log('[TEST] Starting BVG API test...');
+  const origin = await resolveStop('S Hohenzollerndamm');
+  const dest   = await resolveStop('Potsdam Hbf');
+  console.log('[TEST] Origin:', origin?.name, origin?.id);
+  console.log('[TEST] Destination:', dest?.name, dest?.id);
+
+  if (origin && dest) {
+    const now = new Date();
+    now.setHours(23, 30, 0, 0);
+    const journeys = await fetchJourneys(origin.id, dest.id, now.toISOString());
+    console.log('[TEST] Journeys found:', journeys.length);
+    if (journeys.length > 0) {
+      const result = evaluateJourney(journeys[0]);
+      console.log('[TEST] Alert result:', result.status, result.details);
+    }
+  }
+}
+
+testBVGApi();
+
 export default App;
